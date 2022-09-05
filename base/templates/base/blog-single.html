@@ -1,0 +1,196 @@
+{% extends "base/main.html" %}
+{% load static %}
+
+{% block content %}
+
+  <div class="hero hero-single route bg-image" style="background-image: url({% static 'assets/img/overlay-bg.jpg' %})">
+    <div class="overlay-mf"></div>
+    <div class="hero-content display-table">
+      <div class="table-cell">
+        <div class="container">
+          <h2 class="hero-title mb-4">{{post.headline}}</h2>
+          <ol class="breadcrumb d-flex justify-content-center">
+            <li class="breadcrumb-item">
+              <a href="#">Home</a>
+            </li>
+            <li class="breadcrumb-item">
+              <a href="#">Post</a>
+            </li>
+            <li class="breadcrumb-item active">Blog</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <main id="main">
+
+    {% if postss %}
+    <div class="row">
+      {% for post in postss %}
+      <div class="col-md-4">
+        <div class="card card-blog">
+          <a href="{% url 'post' post.slug %}">
+          <div class="card-img">
+            <img src="{{post.thumbnail.url}}" alt="" class="img-fluid">
+          </div>
+        </a>
+          <div class="card-body">
+            <div class="card-category-box">
+              <div class="card-category">
+                <h6 class="category">{{post.headline}}</h6>
+              </div>
+            </div>
+            <h3 class="card-title"><a href="{% url 'post' post.slug %}">{{post.sub_headline}}</a></h3>
+            <p class="card-description">
+              {{post.description}}
+            </p>
+          </div>
+          <div class="card-footer">
+            <div class="post-author">
+              <a href="#">
+                <img src="{% static 'assets/img/testimonial-2.jpg' %}" alt="" class="avatar rounded-circle">
+                <span class="author">{{me}}</span>
+              </a>
+            </div>
+            <div class="post-date">
+              <span class="bi bi-clock"></span> <span>{{post.created.date}}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <!-- ======= Blog Single Section ======= -->
+    <section class="blog-wrapper sect-pt4" id="blog">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-8">
+            <div class="post-box">
+              <div class="post-thumb">
+                <img src="{{post.thumbnail.url}}" class="img-fluid" alt="">
+              </div>
+              <div class="post-meta">
+                <h1 class="article-title">{{post.headline}}</h1>
+                <ul>
+                  <li><span class="bi bi-person"></span>
+                  <a href="#">{{me}}</a></li>
+                </ul>
+              </div>
+              <div class="article-content">
+                <p>{{post.description}}</p>
+                <blockquote class="blockquote">
+                  <p class="mb-0">this will quote for every post</p>
+                </blockquote>
+                {% comment %} <p>{{post.body|safe}}</p> {% endcomment %}
+              </div>
+            </div>
+            <div class="box-comments">
+              <div class="title-box-2">
+                <h4 class="title-comments title-left">Comments ({{post.postcomment_set.all.count}})</h4>
+              </div>
+              <ul class="list-comments">
+                {% for comment in post.postcomment_set.all %}
+                <li>
+                  {% if comment.author.profile_pic.url %}
+                  <div class="comment-avatar">
+                    <img src="{{comment.author.profile_pic.url}}" alt="">
+                  </div>
+                  {% endif %}
+                  <div class="comment-details">
+                    <h4 class="comment-author">{{comment.author}}</h4>
+                    <span>{{comment.created|date:"M-d-Y"}}</span>
+                    <p>{{comment.body}}</p>
+                  </div>
+                </li>
+                {% endfor %}
+                {% comment %} <li class="comment-children">
+                  <div class="comment-avatar">
+                    <img src="{% static 'assets/img/testimonial-2.jpg' %}" alt="">
+                  </div>
+                  <div class="comment-details">
+                    <h4 class="comment-author">Oliver Colmenares</h4>
+                    <span>18 Sep 2017</span>
+                    <p>
+                      Lorem ipsum dolor sit amet, consectetur adipisicing elit. Dolores reprehenderit, provident cumque
+                      ipsam temporibus maiores
+                      quae.
+                    </p>
+                    <a href="3">Reply</a>
+                  </div>
+                </li> {% endcomment %}
+              </ul>
+            </div>
+            <div class="form-comments">
+              <div class="title-box-2">
+                <h3 class="title-left">
+                  Leave a Reply
+                </h3>
+              </div>
+              		<!--
+			- Not logged in, output form and say "Register to comment and give room for a message"
+			- When given username 
+		-->
+    {% endif %}
+		{% if request.user.is_authenticated %}
+		<form action="" method="POST" class="form-mf">
+			{% csrf_token %}
+			<textarea required class="form-control input-mf" placeholder="Leave a comment..." name="comment"></textarea>
+			<br>
+			<input class="button button-a button-big button-rouded" type="submit" value="Submit">
+		</form>
+		{% else %}
+			<p>Create an account to comment:</p>
+			<a class="btn btn-primary" href="{% url 'register' %}">Register/Login</a>
+		{% endif %}
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="widget-sidebar sidebar-search">
+              <h5 class="sidebar-title">Search</h5>
+              <div class="sidebar-content">
+                <form method='GET'>
+                  <div class="input-group">
+                    <input type="text" class="form-control" placeholder="Search for..." aria-label="Search for..." name="q" >
+                    <span class="input-group-btn">
+                      <button class="btn btn-secondary btn-search" type="submit">
+                        <span class="bi bi-search"></span>
+                      </button>
+                    </span>
+                  </div>
+                </form>
+              </div>
+            </div>
+            <div class="widget-sidebar">
+              <h5 class="sidebar-title">Recent Post</h5>
+              <div class="sidebar-content">
+                <ul class="list-sidebar">
+                  {% for posty in posts %}
+                  <li>
+                    <a href="{% url 'post' posty.slug %}">{{posty.headline}}</a>
+                  </li>
+                  {% endfor %}
+                </ul>
+              </div>
+            </div>
+            <div class="widget-sidebar widget-tags">
+              <h5 class="sidebar-title">Tags</h5>
+              <div class="sidebar-content">
+                <ul>
+                  {% for tag in post.tags.all %}
+                  <li>
+                    <a href="#">{{tag.name}}</a>
+                  </li>
+                  {% endfor %}
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section><!-- End Blog Single Section -->
+
+  </main><!-- End #main -->
+
+  {% endblock content %}

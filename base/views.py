@@ -25,30 +25,14 @@ def home(request):
 		'posts':posts,
 		'me':me,
 		}
-	return render(request, 'base/index.html', context)
+	return render(request, 'base/base.html', context)
 
-def posts(request):
-	posts = Post.objects.filter(active=True)
-	myFilter = PostFilter(request.GET, queryset=posts)
-	posts = myFilter.qs
-
-	page = request.GET.get('page')
-
-	paginator = Paginator(posts, 5)
-
-	try:
-		posts = paginator.page(page)
-	except PageNotAnInteger:
-		posts = paginator.page(1)
-	except EmptyPage:
-		posts = paginator.page(paginator.num_pages)
-
-	context = {'posts':posts, 'myFilter':myFilter}
-	return render(request, 'base/posts.html', context)
 
 def post(request, slug):
 	post = Post.objects.get(slug=slug)
-
+	me = Me.objects.get(first_name='Haboubi')
+	posts = Post.objects.filter(active=True).exclude(slug=slug)
+	postss = Post.objects.none()
 	if request.method == 'POST':
 		PostComment.objects.create(
 			author=request.user.profile,
@@ -58,13 +42,17 @@ def post(request, slug):
 		messages.success(request, "You're comment was successfuly posted!")
 
 		return redirect('post', slug=post.slug)
+	# if request.method == 'GET':
+	# 	q = request.GET.get('q')
+	# 	postss = Post.objects.filter(headline__icontains=q)
 
-
-	context = {'post':post}
-	return render(request, 'base/post.html', context)
-
-def profile(request):
-	return render(request, 'base/profile.html')
+	context = {
+		'post':post,
+		'posts':posts,
+		# 'postss':postss,
+		'me':me,
+		}
+	return render(request, 'base/blog-single.html', context)
 
 #CRUD VIEWS
 @admin_only
@@ -113,22 +101,27 @@ def deletePost(request, slug):
 def sendEmail(request):
 
 	if request.method == 'POST':
+		name = request.POST.get('name')
+		email = request.POST.get('email')
+		subject = request.POST.get('subject')
+		message = request.POST.get('message')
+		Message.objects.create(name=name,email=email,subject=subject,message=message)
+		redirect('/')
+	# 	template = render_to_string('base/email_template.html', {
+	# 		'name':request.POST['name'],
+	# 		'email':request.POST['email'],
+	# 		'message':request.POST['message'],
+	# 		})
 
-		template = render_to_string('base/email_template.html', {
-			'name':request.POST['name'],
-			'email':request.POST['email'],
-			'message':request.POST['message'],
-			})
+	# 	email = EmailMessage(
+	# 		request.POST['subject'],
+	# 		template,
+	# 		settings.EMAIL_HOST_USER,
+	# 		['belhassenzzh5@gmail.com']
+	# 		)
 
-		email = EmailMessage(
-			request.POST['subject'],
-			template,
-			settings.EMAIL_HOST_USER,
-			['dennisivy11@gmail.com']
-			)
-
-		email.fail_silently=False
-		email.send()
+	# 	email.fail_silently=False
+	# 	email.send()
 
 	return render(request, 'base/email_sent.html')
 
@@ -209,3 +202,12 @@ def updateProfile(request):
 
 	context = {'form':form}
 	return render(request, 'base/profile_form.html', context)
+
+#CRUD for projects
+def project(request,slug):
+	project = Project.objects.get(slug=slug)
+	context = {
+		'project':project
+	}
+
+	return render(request,"base/portfolio-details.html",context)

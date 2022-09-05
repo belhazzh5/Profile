@@ -3,9 +3,8 @@ from . import views
 
 urlpatterns = [
 	path('', views.home, name="home"),
-	path('posts/', views.posts, name="posts"),
 	path('post/<slug:slug>/', views.post, name="post"),
-	path('profile/', views.profile, name="profile"),
+	path('projects/<slug:slug>/', views.project, name="project"),
 
 	#CRUD PATHS
 
@@ -13,7 +12,8 @@ urlpatterns = [
 	path('update_post/<slug:slug>/', views.updatePost, name="update_post"),
 	path('delete_post/<slug:slug>/', views.deletePost, name="delete_post"),
 
-
+	#Authentification
+	
 	path('send_email/', views.sendEmail, name="send_email"),
 
 	path('login/', views.loginPage, name="login"),
